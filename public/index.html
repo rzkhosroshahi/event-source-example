@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <button onclick="randomChat()">random message</button>
+      <div class="msg">
+
+      </div>
+    </div>
+    <script>
+      let eventSource = new EventSource("/message-event");
+
+      eventSource.addEventListener('chat', (e) => {
+        const data = JSON.parse(e.data);
+        const ul = document.createElement('ul');
+        data.map((data) => {
+            const li = document.createElement('li');
+            li.innerHTML = `msg: ${data.message} - ${data.date}`;
+            ul.appendChild(li);
+        });
+        document.querySelector('.msg').appendChild(ul);
+        console.log('eee >>', e.data);
+      });
+
+      function randomChat() {
+        fetch("/message", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: Math.random(), date: new Date() }),
+        })
+          .then((response) => response.json())
+          .then((data) => console.log("Message response:", data));
+      }
+    </script>
+  </body>
+</html>
